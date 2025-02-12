@@ -122,7 +122,12 @@ scene.add(camera)
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-
+controls.dampingFactor = 0.05
+controls.rotateSpeed = 0.3
+controls.minPolarAngle = 0
+controls.maxPolarAngle = Math.PI / 2 - 0.1
+controls.minAzimuthAngle = 0; 
+controls.maxAzimuthAngle = Math.PI ;
 /**
  * Renderer
  */
@@ -138,10 +143,30 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 const clock = new THREE.Clock()
 
+const slowDownAtLimits = (elapsedTime) => {
+    const polarAngle = controls.getPolarAngle(); 
+    const azimuthAngle = controls.getAzimuthalAngle(); 
+
+    if (polarAngle < 0.1 || polarAngle > Math.PI / 2 - 0.1) {
+        
+        controls.dampingFactor = 0.01;
+    } else {
+        controls.dampingFactor = 0.05;  
+    }
+
+
+    if (azimuthAngle < 0.1 || azimuthAngle > Math.PI - 0.1) {
+        
+        controls.dampingFactor = 0.01;  
+    } else {
+        controls.dampingFactor = 0.05;  
+    }
+}
+
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
-
+    slowDownAtLimits(elapsedTime)
     // Update controls
     controls.update()
 
