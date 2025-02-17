@@ -4,6 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
+
+
 // const SPECTOR = require('spectorjs')
 // const spector = new SPECTOR.Spector()
 // spector.displayUI()
@@ -49,17 +51,48 @@ bakedTexture.colorSpace = THREE.SRGBColorSpace
  * Material
  */
 //baked material
-const bakedMaterial = new THREE.MeshBasicMaterial({map: bakedTexture} )
+const bakedMaterial = new THREE.MeshLambertMaterial({map: bakedTexture} )
 /**
  * portal Light material
  */
-const portalLightMaterial = new THREE.MeshBasicMaterial({color: 0x4a53ff})
 
+
+//GUI controls
+const settings = {
+    //portalColor: "#4a53ff"   //bez ambijentalnog
+   portalColor:"#323cf5"
+}
+const portalLightMaterial = new THREE.MeshStandardMaterial({
+    color: settings.portalColor,
+    emissive: new THREE.Color(settings.portalColor),
+    emissiveIntensity: 2
+    
+})
+
+
+//ambijetalno svjetlo da portal moze realisticnije mjenjat boje
+/////
+const ambientLight = new THREE.AmbientLight(settings.color, 0.4)
+scene.add(ambientLight)
+
+const ambientLight1 = new THREE.AmbientLight(0xffffff, 1)
+scene.add(ambientLight1)
+/////
+
+const polelightMaterial= new THREE.MeshBasicMaterial({color: 0xFF694AF})
+
+
+gui.addColor(settings, "portalColor").onChange(value => {
+     portalLightMaterial.color.set(value),
+     portalLightMaterial.emissive.set(value),
+     //
+     ambientLight.color.set(value)
+     //
+})
 /**
  * 
  * Pole light material
  */
-const polelightMaterial= new THREE.MeshBasicMaterial({color: 0xFF694AF})
 
 /**
  * Model
@@ -169,7 +202,7 @@ const tick = () =>
     slowDownAtLimits(elapsedTime)
     // Update controls
     controls.update()
-
+    
     // Render
     renderer.render(scene, camera)
 
