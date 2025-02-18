@@ -5,12 +5,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 
-
-// const SPECTOR = require('spectorjs')
-// const spector = new SPECTOR.Spector()
-// spector.displayUI()
-
-
 /**
  * Base
  */
@@ -38,8 +32,6 @@ dracoLoader.setDecoderPath('draco/')
 // GLTF loader
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
-
-
 /**
  * Textures
  */
@@ -52,35 +44,41 @@ bakedTexture.colorSpace = THREE.SRGBColorSpace
  */
 //baked material
 const bakedMaterial = new THREE.MeshLambertMaterial({map: bakedTexture} )
-/**
- * portal Light material
- */
-
 
 //GUI controls
 const settings = {
     //portalColor: "#4a53ff"   //bez ambijentalnog
-   portalColor:"#323cf5"
+   portalColor:"#323cf5",
+   poleLightColor: "#ff52a3"
 }
 const portalLightMaterial = new THREE.MeshStandardMaterial({
     color: settings.portalColor,
     emissive: new THREE.Color(settings.portalColor),
     emissiveIntensity: 2
-    
 })
 
+const polelightMaterial = new THREE.MeshStandardMaterial({
+    color: settings.poleLightColor,
+    emissive: new THREE.Color(settings.poleLightColor),
+    emissiveIntensity: 2
+ })
 
 //ambijetalno svjetlo da portal moze realisticnije mjenjat boje
 /////
-const ambientLight = new THREE.AmbientLight(settings.color, 0.4)
+const ambientLight = new THREE.AmbientLight(settings.portalColor, 0.4)
 scene.add(ambientLight)
-
-const ambientLight1 = new THREE.AmbientLight(0xffffff, 1)
+const ambientLightpole = new THREE.AmbientLight(settings.poleLightColor, 0.2)
+scene.add(ambientLightpole)
+const ambientLight1 = new THREE.AmbientLight(0xffffff, 1.5)
 scene.add(ambientLight1)
 /////
 
-const polelightMaterial= new THREE.MeshBasicMaterial({color: 0xFF694AF})
+gui.addColor(settings, "poleLightColor").onChange(value => {
+    polelightMaterial.color.set(value),
+    polelightMaterial.emissive.set(value),
 
+    ambientLightpole.color.set(value)
+})
 
 gui.addColor(settings, "portalColor").onChange(value => {
      portalLightMaterial.color.set(value),
@@ -89,10 +87,6 @@ gui.addColor(settings, "portalColor").onChange(value => {
      ambientLight.color.set(value)
      //
 })
-/**
- * 
- * Pole light material
- */
 
 /**
  * Model
